@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="generator" content="hevea 2.30">
+<link rel="stylesheet" type="text/css" href="omniORBpy.css">
+<title>Interceptors</title>
+</head>
+<body >
+<a href="omniORBpy008.html"><img src="previous_motif.gif" alt="Previous"></a>
+<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
+<a href="omniORBpy010.html"><img src="next_motif.gif" alt="Next"></a>
+<hr>
+<h1 id="sec118" class="chapter">Chapter&#XA0;9&#XA0;&#XA0;Interceptors</h1>
+<p>
+<a id="chap:interceptors"></a></p><p>omniORBpy has limited interceptor support. Interceptors permit the
+application to insert processing at various points along the call
+chain, as requests are processed. The Portable Interceptors API is not
+yet supported.</p><p>Interceptors are registered using functions in the
+<span style="font-family:monospace">omniORB.interceptors</span> module:</p><div class="lstlisting"><span style="font-size:small">  </span><span style="font-size:small">addClientSendRequest</span><span style="font-size:small">()</span><span style="font-size:small">
+</span><span style="font-size:small">  </span><span style="font-size:small">addClientReceiveReply</span><span style="font-size:small">()</span><span style="font-size:small">
+</span><span style="font-size:small">  </span><span style="font-size:small">addServerReceiveRequest</span><span style="font-size:small">()</span><span style="font-size:small">
+</span><span style="font-size:small">  </span><span style="font-size:small">addServerSendReply</span><span style="font-size:small">()</span><span style="font-size:small">
+</span><span style="font-size:small">  </span><span style="font-size:small">addServerSendException</span><span style="font-size:small">()</span></div><p>To register an interceptor function, call the relevant registration
+function with a callable argument. The callable will be called with
+two or three arguments. The first argument is a string containing the
+name of the operation being invoked; the second is the collection of
+service contexts to be retrieved or filled in.
+<span style="font-family:monospace">ServerSendException</span> has a third argument, the repository id of
+the exception being thrown.</p><p>When receiving service contexts (in the <span style="font-family:monospace">ClientReceiveReply</span> and
+<span style="font-family:monospace">ServerReceiveRequest</span> interceptors), the second argument
+is a tuple of 2-tuples. In each 2-tuple, the first item is the service
+context id and the second item is the CDR encapsulation of the service
+context. The encapsulation can be decoded with
+<span style="font-family:monospace">omniORB.cdrUnmarshal()</span> (but only if you know the type to decode it
+to).</p><p>When sending service contexts (<span style="font-family:monospace">ClientSendRequest</span>,
+<span style="font-family:monospace">ServerSendReply</span>, and <span style="font-family:monospace">ServerSendException</span>), the second
+argument is an empty list. The interceptor function can choose to add
+one or more service context tuples, with the same form described
+above, by appending to the list. Encapsulations are created with
+<span style="font-family:monospace">omniORB.cdrMarshal()</span>.</p><p>Interceptor registration functions may only be called before the ORB
+is initialised. Attempting to call them later results in a
+<span style="font-family:monospace">BAD_INV_ORDER</span> exception.</p>
+<hr>
+<a href="omniORBpy008.html"><img src="previous_motif.gif" alt="Previous"></a>
+<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
+<a href="omniORBpy010.html"><img src="next_motif.gif" alt="Next"></a>
+</body>
+</html>
