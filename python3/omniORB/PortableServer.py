@@ -25,8 +25,8 @@
 # Description:
 #    PortableServer module
 
-import _omnipy
 import omniORB
+import _omnipy
 from omniORB import CORBA
 
 try:

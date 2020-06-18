@@ -37,5 +37,12 @@ Functions:
   key_file_password()
 """
 
-import _omnipy
-from _omnisslTP import *
+import omniORB
+
+if omniORB.omniorb_dll_path is not None:
+    with os.add_dll_directory(omniorb_dll_path):
+        import _omnipy
+        from _omnisslTP import *
+else:
+    import _omnipy
+    from _omnisslTP import *

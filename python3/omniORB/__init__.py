@@ -3,7 +3,7 @@
 # __init__.py                Created on: 1999/07/19
 #                            Author    : Duncan Grisby (dpg1)
 #
-#    Copyright (C) 2002-2014 Apasphere Ltd
+#    Copyright (C) 2002-2019 Apasphere Ltd
 #    Copyright (C) 1999 AT&T Laboratories Cambridge
 #
 #    This file is part of the omniORBpy library
@@ -30,7 +30,7 @@
 omniORB module -- omniORB specific features
 """
 
-import sys, types, imp, os, os.path, tempfile
+import sys, types, os, os.path, tempfile
 
 try:
     import threading
@@ -41,7 +41,30 @@ Error: your Python executable was not built with thread support.
 """)
     raise ImportError("Python executable has no thread support")
 
-import _omnipy
+omniorb_dll_path = None
+
+if sys.platform == "win32" and hasattr(os, "add_dll_directory"):
+    # Python 3.8 on Windows no longer looks in PATH to find DLLs,
+    # meaning that importing the omniORBpy extension modules fails.
+    # You can set the OMNIORB_DLL_PATH environment variable to the
+    # directory they are in, or this attempts to find them in the
+    # default location.
+    omniorb_dll_path = os.environ.get("OMNIORB_DLL_PATH")
+
+    if omniorb_dll_path is None:
+        omniorb_dll_path = os.path.abspath(
+                               os.path.join(os.path.dirname(__file__),
+                                            r"..\..\..\bin\x86_win32"))
+
+    if not os.path.isdir(omniorb_dll_path):
+        omniorb_dll_path = None
+
+
+if omniorb_dll_path is not None:
+    with os.add_dll_directory(omniorb_dll_path):
+        import _omnipy
+else:
+    import _omnipy
 
 _coreVersion = _omnipy.coreVersion()
 __version__  = _omnipy.__version__
@@ -105,7 +128,7 @@ e.g. omniidlArguments(["-I/my/include", "-DMY_DEFINE"])"""
 
 # Import an IDL file by forking the IDL compiler and processing the
 # output
-def importIDL(idlname, args=None, inline=1):
+def importIDL(idlname, args=None, inline=True):
     """importIDL(filename [, args ] [, inline ]) -> tuple
 
 Run the IDL compiler on the specified IDL file, and import the
@@ -114,54 +137,54 @@ used as arguments to omniidl. If args is not present, uses the default
 set with omniidlArguments().
 
 Normally imports the definitions for #included files as well as the
-main file. Set inline to 0 to only import definitions for the main
+main file. Set inline to False to only import definitions for the main
 file.
 
 Returns a tuple of Python module names corresponding to the IDL module
 names declared in the file. The modules can be accessed through
 sys.modules."""
 
+    import subprocess
+
     if not os.path.isfile(idlname):
         raise ImportError("File " + idlname + " does not exist")
 
-    if args is None: args = _omniidl_args
-    if inline:
-        inline_str = "-Wbinline "
-    else:
-        inline_str = ""
+    if args is None:
+        args = _omniidl_args
 
-    argstr  = " ".join(args)
     modname = os.path.basename(idlname).replace(".", "_")
-    pipe    = os.popen("omniidl -q -bpython -Wbstdout " + inline_str + \
-                       argstr + " " + idlname)
-    try:
-        tempname  = tempfile.mktemp()
-        tempnamec = tempname + "c"
-        while os.path.exists(tempnamec):
-            tempname  = tempfile.mktemp()
-            tempnamec = tempname + "c"
 
-        m = imp.load_module(modname, pipe, tempname,
-                            (".idl", "r", imp.PY_SOURCE))
-    finally:
-        # Get rid of byte-compiled file
-        if os.path.isfile(tempnamec):
-            os.remove(tempnamec)
+    cmd = ["omniidl", "-bpython", "-Wbstdout"]
 
-        # Close the pipe
-        if pipe.close() is not None:
-            del sys.modules[modname]
-            raise ImportError("Error spawning omniidl")
+    if inline:
+        cmd.append("-Wbinline")
+
+    cmd.extend(args)
+    cmd.append(idlname)
+
+    with subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE) as proc:
+
+        source = proc.stdout.read()
+        errors = proc.stderr.read()
+        status = proc.wait()
+
+    if status:
+        if not isinstance(errors, str):
+            errors = errors.decode("utf-8")
+
+        raise ImportError(errors)
+
     try:
-        m.__file__ = idlname
-        mods = m._exported_modules
+        mdict = {"__file__": idlname}
+        exec(source, mdict)
+        mods = mdict["_exported_modules"]
 
         for mod in mods:
             for m in (mod, skeletonModuleName(mod)):
                 if m in _partialModules:
                     if m in sys.modules:
-                        sys.modules[m].__dict__.update(
-                            _partialModules[m].__dict__)
+                        updateModuleDict(sys.modules[m], _partialModules[m])
                     else:
                         sys.modules[m] = _partialModules[m]
                     del _partialModules[m]
@@ -169,11 +192,11 @@ sys.modules."""
         return mods
 
     except (AttributeError, KeyError):
-        del sys.modules[modname]
+        sys.modules.pop(modname, None)
         raise ImportError("Invalid output from omniidl")
 
 
-def importIDLString(str, args=None, inline=1):
+def importIDLString(str, args=None, inline=True):
     """importIDLString(string [, args ] [, inline ]) -> tuple
 
 Run the IDL compiler on the given string, and import the resulting
@@ -182,7 +205,7 @@ arguments to omniidl. If args is not present, uses the default set
 with omniidlArguments().
 
 Normally imports the definitions for #included files as well as the
-main file. Set inline to 0 to only import definitions for the main
+main file. Set inline to False to only import definitions for the main
 file.
 
 Returns a tuple of Python module names corresponding to the IDL module
@@ -366,7 +389,7 @@ def openModule(mname, fname=None):
 
         if mname in _partialModules:
             pmod = _partialModules[mname]
-            mod.__dict__.update(pmod.__dict__)
+            updateModuleDict(mod, pmod)
             del _partialModules[mname]
             
     elif mname in _partialModules:
@@ -401,7 +424,7 @@ def newModule(mname):
             mod = _partialModules[current]
 
         else:
-            newmod = imp.new_module(current)
+            newmod = types.ModuleType(current)
             _partialModules[current] = mod = newmod
 
         current = current + "."
@@ -416,8 +439,17 @@ def updateModule(mname):
     if mname in _partialModules:
         pmod = _partialModules[mname]
         mod  = sys.modules[mname]
-        mod.__dict__.update(pmod.__dict__)
+        updateModuleDict(mod, pmod)
         del _partialModules[mname]
+
+
+def updateModuleDict(dest, source):
+    dd = dest.__dict__
+    sd = source.__dict__
+    
+    for k, v in sd.items():
+        if not (k.startswith("__") and k.endswith("__")):
+            dd[k] = v
 
 
 def promotePartialModule(mname):
@@ -442,13 +474,17 @@ def newEmptyClass():
     return __dummy
 
  
+# Docstring setting
+def setDocString(obj, doc):
+    obj.__doc__ = doc
+
+
 # Classes to support IDL type mapping
 
 class EnumItem(object):
     def __init__(self, name, value):
         self._n = name
         self._v = value
-        return
 
     def __str__(self):
         return self._n
@@ -456,17 +492,41 @@ class EnumItem(object):
     def __repr__(self):
         return self._n
 
-    def __cmp__(self, other):
-        try:
-            if isinstance(other, EnumItem):
-                if other._parent_id == self._parent_id:
-                    return cmp(self._v, other._v)
-                else:
-                    return cmp(self._parent_id, other._parent_id)
-            else:
-                return cmp(id(self), id(other))
-        except:
-            return cmp(id(self), id(other))
+    def __eq__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v == other._v
+        else:
+            return NotImplemented
+
+    def __ne__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v != other._v
+        else:
+            return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v < other._v
+        else:
+            return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v <= other._v
+        else:
+            return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v > other._v
+        else:
+            return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, EnumItem) and other._parent_id == self._parent_id:
+            return self._v >= other._v
+        else:
+            return NotImplemented
 
     def __hash__(self):
         return hash(self._parent_id + "/" + self._n)
@@ -544,6 +604,9 @@ class Union(object):
             self.__setattr__(k, kw[k])
 
     def __getattr__(self, mem):
+        if mem[0] == "_":
+            raise AttributeError(mem)
+
         try:
             cmem = self._d_to_m[self._d]
             if mem == cmem:
@@ -875,7 +938,7 @@ class WorkerThread(threading.Thread):
 
 class omniThreadHook(object):
     def __init__(self, target):
-        self.target            = target
+        self.target = target
 
         try:
             self.target_stop       = target._Thread__stop

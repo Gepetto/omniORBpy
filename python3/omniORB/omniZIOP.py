@@ -25,4 +25,10 @@
 # Description:
 #    omniORB ZIOP module
 
-from _omniZIOP import *
+import omniORB
+
+if omniORB.omniorb_dll_path is not None:
+    with os.add_dll_directory(omniorb_dll_path):
+        from _omniZIOP import *
+else:
+    from _omniZIOP import *

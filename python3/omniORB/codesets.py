@@ -31,5 +31,12 @@ Import this module before calling CORBA.ORB_init() to make extra char
 and wchar code sets available.
 """
 
-import _omnipy
-import _omnicodesets
+import omniORB
+
+if omniORB.omniorb_dll_path is not None:
+    with os.add_dll_directory(omniorb_dll_path):
+        import _omnipy
+        import _omnicodesets
+else:
+    import _omnipy
+    import _omnicodesets

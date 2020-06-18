@@ -35,5 +35,12 @@ Functions:
   makeRestrictedReference
 """
 
-import _omnipy
-from _omniConnMgmt import *
+import omniORB
+
+if omniORB.omniorb_dll_path is not None:
+    with os.add_dll_directory(omniorb_dll_path):
+        import _omnipy
+        from _omniConnMgmt import *
+else:
+    import _omnipy
+    from _omniConnMgmt import *

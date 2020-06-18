@@ -3,7 +3,7 @@
 # interceptors.py            Created on: 2003/05/27
 #                            Author    : Duncan Grisby (dgrisby)
 #
-#    Copyright (C) 2003-2013 Apasphere Ltd
+#    Copyright (C) 2003-2019 Apasphere Ltd
 #
 #    This file is part of the omniORBpy library
 #
@@ -27,7 +27,7 @@
 
 """omniORB.interceptors
 
-Interceptor registration functions:
+Request interceptor registration functions:
 
   addClientSendRequest
   addClientReceiveReply
@@ -35,12 +35,17 @@ Interceptor registration functions:
   addServerSendReply
   addServerSendException
 
-To register an interceptor function, call the relevant registration
-function with a callable argument. The callable will be called with
-two or three arguments. The first argument is the name of the
-operation being invoked; the second is the set of service contexts to
-be retrieved or filled in. ServerSendException has a third argument,
-the repository id of the exception being thrown.
+Thread interceptor registration functions:
+
+  addAssignUpcallThread
+  addAssignAMIThread
+
+To register a request interceptor function, call the relevant
+registration function with a callable argument. The callable will be
+called with two or three arguments. The first argument is the name of
+the operation being invoked; the second is the set of service contexts
+to be retrieved or filled in. ServerSendException has a third
+argument, the repository id of the exception being thrown.
 
 When receiving service contexts (ClientReceiveReply,
 ServerReceiveRequest), the second argument is a tuple of 2-tuples. In
@@ -54,6 +59,15 @@ ServerSendException), the second argument is an empty list. The
 interceptor function can choose to add one or more service context
 tuples, with the same form described above, by appending to the list.
 Encapsulations are created with omniORB.cdrMarshal().
+
+To register thread interceptors, call the relevant registration
+function with a callable argument. The callable can be a simple
+function that returns None, or a generator that yields once. When a
+thread is assigned to perform server upcalls or AMI calls, the
+corresponding function is called. If it is a simple function, the
+function is called when the thread is assigned. If it is a generator,
+it is called when the thread is assigned, yields to permit the thread
+to execute, and then resumes when the thread is unassigned.
 
 Interceptor registration functions may only be called before the ORB
 is initialised. Attempting to call them later results in a

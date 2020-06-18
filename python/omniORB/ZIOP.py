@@ -3,7 +3,7 @@
 # ZIOP.py                    Created on: 2013/05/28
 #                            Author    : Duncan Grisby (dgrisby)
 #
-#    Copyright (C) 2013 Apasphere Ltd
+#    Copyright (C) 2013-2019 Apasphere Ltd
 #
 #    This file is part of the omniORBpy library
 #
@@ -25,7 +25,14 @@
 # Description:
 #    ZIOP module
 
+import sys
+
+import omniORB.compression_idl
+sys.modules["compression_idl"] = omniORB.compression_idl
+
 import omniORB.ziop_idl
+sys.modules["ziop_idl"] = omniORB.ziop_idl
+
 import _omniZIOP
 from omniORB import CORBA
 

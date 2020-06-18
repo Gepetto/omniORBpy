@@ -257,10 +257,11 @@ The following is a list of the most significant missing features.
 
 \begin{itemize}
 
-\item omniORB does not have its own Interface Repository. However, it
-  can act as a client to an IfR. The omniifr project
-  (\weburl{http://omniifr.sourceforge.net/}) aims to create an IfR for
-  omniORB.
+\item For some very dynamic uses of CORBA, you may need an Interface
+  Repository. omniORB does not have its own one, but it can act as a
+  client to an IfR. The omniifr project
+  (\url{https://github.com/omniorb/omniifr}) aims to create an IfR
+  for omniORB.
 
 \item omniORB supports interceptors, but not the standard Portable
   Interceptor API. Interceptor facilities available from Python code
@@ -2407,9 +2408,16 @@ The definitions used by the C++ API are in the \file{omniORBpy.h}
 header. An example of its use is in \file{examples/embed/}.
 
 The API is accessed through a singleton structure containing function
-pointers. A pointer to the API struct is stored as a \code{PyCObject}
-in the \module{\_omnipy} module with the name \code{API}. It can be
-accessed with code like:
+pointers. In Python 3.x, a pointer to the API struct is stored in a
+\code{PyCapsule} named \code{\_omnipy.API}. Access it with code like:
+
+\begin{cxxlisting}
+omniORBpyAPI* api = (omniORBpyAPI*)PyCapsule_Import("_omnipy.API", 0);
+\end{cxxlisting}
+
+\noindent In Python 2.x, a pointer to the API struct is stored as a
+\code{PyCObject} in the \module{\_omnipy} module with the name
+\code{API}. It can be accessed with code like:
 
 \begin{cxxlisting}
 PyObject*     omnipy = PyImport_ImportModule((char*)"_omnipy");
@@ -4172,10 +4180,12 @@ C++ documentation for details.
 omniORBpy has limited interceptor support. Interceptors permit the
 application to insert processing at various points along the call
 chain, as requests are processed. The Portable Interceptors API is not
-yet supported.
+supported.
 
-Interceptors are registered using functions in the
-\code{omniORB.interceptors} module:
+\section{Request interceptors}
+
+Interceptors for incoming and outgoing requests are registered using
+functions in the \code{omniORB.interceptors} module:
 
 \begin{pylisting}
   addClientSendRequest()
@@ -4213,6 +4223,34 @@ is initialised. Attempting to call them later results in a
 \code{BAD\_INV\_ORDER} exception.
 
 
+\section{Thread interceptors}
+
+Thread interceptors are registered using functions in the
+\code{omniORB.interceptors} module:
+
+\begin{pylisting}
+  addAssignUpcallThread
+  addAssignAMIThread
+\end{pylisting}
+
+To register thread interceptors, call the relevant registration
+function with a callable argument. The callable can be a simple
+function that returns None, or a generator that yields once. When a
+thread is assigned to perform server upcalls or AMI calls, the
+corresponding function is called. If it is a simple function, the
+function is called when the thread is assigned. If it is a generator,
+it is called when the thread is assigned, yields to permit the thread
+to execute, and then resumes when the thread is unassigned. For
+example:
+
+\begin{pylisting}
+def upcallInterceptor():
+    print("This thread is about to be used to call into server code")
+    yield
+    print("The thread has finished")
+
+omniORB.interceptors.addAssignUpcallThread(upcallInterceptor)
+\end{pylisting}
 
 
 
@@ -4494,18 +4532,16 @@ There are a number of useful online resources related to omniORB:
 
 \begin{itemize}
 
-\item \url{http://omniorb.sourceforge.net/} is the main omniORB web
+\item \url{https://www.omniorb.net/} is the main omniORB web
   site.
-
-\item The omniORB FAQ is at \url{http://omniorb.sourceforge.net/faq.html}
 
 \item The omniORB mailing list is the first port of call for questions
   that are not answered in this document or in the FAQ. Subscription
   information and archives are at
-  \url{http://omniorb.sourceforge.net/list.html}
+  \url{https://www.omniorb.net/list.html}
 
 \item Commercial support is available from
-  \url{http://www.omniorb-support.com/}
+  \url{https://www.omniorb-support.com/}
 
 \end{itemize}
 

@@ -1,14 +1,14 @@
 omniORBpy 4.2
 =============
 
-This is omniORBpy 4.2.2.
+This is omniORBpy 4.2.3.
 
 omniORBpy is a robust high-performance CORBA ORB for Python.
 
 The bindings adhere to the standard IDL to Python mapping which you
 may find at
 
-  http://www.omg.org/technology/documents/formal/python_language_mapping.htm
+  https://www.omg.org/spec/PYTH
 
 
 omniORBpy makes use of the C++ omniORB library. omniORBpy version
@@ -20,7 +20,7 @@ contributors.
 
 It is a good idea to subscribe to the omniORB mailing list. See
 
-    http://omniorb.sourceforge.net/list.html
+    https://www.omniorb.net/list.html
 
 
 Please report any bugs you find to the mailing list.

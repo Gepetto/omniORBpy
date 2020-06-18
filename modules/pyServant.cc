@@ -704,8 +704,13 @@ Py_omniServant::remote_dispatch(Py_omniCallDescriptor* pycd)
 
       if (edesc) {
 	Py_DECREF(erepoId); Py_DECREF(etype); Py_XDECREF(etraceback);
-	PyUserException ex(edesc, evalue, CORBA::COMPLETED_MAYBE);
-	ex._raise();
+        try {
+          PyUserException ex(edesc, evalue, CORBA::COMPLETED_MAYBE);
+          ex._raise();
+        }
+        catch (Py_BAD_PARAM& bp) {
+          bp.logInfoAndThrow();
+        }
       }
     }
 

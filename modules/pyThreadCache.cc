@@ -34,7 +34,9 @@ static int static_cleanup = 0;
 // Set true when static data is being destroyed. Used to make sure
 // Python things aren't used after they have gone away.
 
-omni_mutex*                    omnipyThreadCache::guard      = 0;
+static omni_mutex the_guard;
+
+omni_mutex*                    omnipyThreadCache::guard      = &the_guard;
 const unsigned int             omnipyThreadCache::tableSize  = 67;
 omnipyThreadCache::CacheNode** omnipyThreadCache::table      = 0;
 unsigned int                   omnipyThreadCache::scanPeriod = 30;
@@ -90,7 +92,6 @@ omnipyThreadCache::
 init()
 {
   omnithread_key = omni_thread::allocate_key();
-  guard          = new omni_mutex();
   table          = new CacheNode*[tableSize];
   for (unsigned int i=0; i < tableSize; i++) table[i] = 0;
 
@@ -105,9 +106,7 @@ shutdown()
   if (the_scavenger) the_scavenger->kill();
   the_scavenger = 0;
 
-  if (guard) delete guard;
   table = 0;
-  guard = 0;
 }
 
 
@@ -459,9 +458,9 @@ run_undetached(void*)
 }
 
 
-class _omnipy_cleapup_detector {
+class _omnipy_cleanup_detector {
 public:
-  inline ~_omnipy_cleapup_detector() { static_cleanup = 1; }
+  inline ~_omnipy_cleanup_detector() { static_cleanup = 1; }
 };
 
-static _omnipy_cleapup_detector _the_omnipy_cleapup_detector;
+static _omnipy_cleanup_detector _the_omnipy_cleanup_detector;

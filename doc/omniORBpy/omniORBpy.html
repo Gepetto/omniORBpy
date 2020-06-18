@@ -2,7 +2,7 @@
 <html >
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<meta name="generator" content="hevea 2.30">
+<meta name="generator" content="hevea 2.32">
 <style type="text/css">
 .li-itemize{margin:1ex 0ex;}
 .li-enumerate{margin:1ex 0ex;}
@@ -53,7 +53,7 @@ td p{margin:0px;}
 <title>omniORBpy</title>
 </head>
 <body >
-<!--HEVEA command line is: hevea omniORBpy -->
+<!--HEVEA command line is: hevea omniORBpy.tex -->
 <!--CUT STYLE book--><!--CUT DEF chapter 1 --><div class="center"><p> <span style="font-size:xx-large"><span style="font-size:150%">The omniORBpy version 4.2<br>
 User&#X2019;s Guide
 </span></span></p><p> <span style="font-size:x-large">Duncan Grisby<br>
@@ -97,10 +97,11 @@ It is designed to be easy to port to new platforms.</p>
 <!--TOC subsection id="sec5" Missing features-->
 <h3 id="sec5" class="subsection">1.1.3&#XA0;&#XA0;Missing features</h3><!--SEC END --><p>
 <a id="sec:missing"></a></p><p>omniORB is not a complete implementation of the CORBA 2.6 core.
-The following is a list of the most significant missing features.</p><ul class="itemize"><li class="li-itemize">omniORB does not have its own Interface Repository. However, it
-can act as a client to an IfR. The omniifr project
-(<a href="http://omniifr.sourceforge.net/"><span style="font-family:monospace">http://omniifr.sourceforge.net/</span></a>) aims to create an IfR for
-omniORB.</li><li class="li-itemize">omniORB supports interceptors, but not the standard Portable
+The following is a list of the most significant missing features.</p><ul class="itemize"><li class="li-itemize">For some very dynamic uses of CORBA, you may need an Interface
+Repository. omniORB does not have its own one, but it can act as a
+client to an IfR. The omniifr project
+(<a href="https://github.com/omniorb/omniifr"><span style="font-family:monospace">https://github.com/omniorb/omniifr</span></a>) aims to create an IfR
+for omniORB.</li><li class="li-itemize">omniORB supports interceptors, but not the standard Portable
 Interceptor API. Interceptor facilities available from Python code
 are quite limited.</li><li class="li-itemize">DII, DSI and DynAny are not available in Python, but Python&#X2019;s
 normal dynamic features can be used to write code with the same
@@ -1370,9 +1371,10 @@ to convert object references between their Python representation and
 their C++ representation. For extensions to omniORBpy itself, it has a
 mechanism for adding pseudo object types to omniORBpy.</p><p>The definitions used by the C++ API are in the <span style="font-family:monospace">omniORBpy.h</span>
 header. An example of its use is in <span style="font-family:monospace">examples/embed/</span>.</p><p>The API is accessed through a singleton structure containing function
-pointers. A pointer to the API struct is stored as a <span style="font-family:monospace">PyCObject</span>
-in the <span style="font-family:monospace">_omnipy</span> module with the name <span style="font-family:monospace">API</span>. It can be
-accessed with code like:</p><div class="lstlisting"><span style="font-size:small">PyObject</span><span style="font-size:small">*     </span><span style="font-size:small">omnipy</span><span style="font-size:small"> = </span><span style="font-size:small">PyImport_ImportModule</span><span style="font-size:small">((</span><span style="font-size:small"><span style="font-weight:bold">char</span></span><span style="font-size:small">*)</span><span style="font-size:small"><span style="font-size:small">"_omnipy"</span></span><span style="font-size:small">);</span><span style="font-size:small">
+pointers. In Python 3.x, a pointer to the API struct is stored in a
+<span style="font-family:monospace">PyCapsule</span> named <span style="font-family:monospace">_omnipy.API</span>. Access it with code like:</p><div class="lstlisting"><span style="font-size:small">omniORBpyAPI</span><span style="font-size:small">* </span><span style="font-size:small">api</span><span style="font-size:small"> = (</span><span style="font-size:small">omniORBpyAPI</span><span style="font-size:small">*)</span><span style="font-size:small">PyCapsule_Import</span><span style="font-size:small">(</span><span style="font-size:small"><span style="font-size:small">"_omnipy.API"</span></span><span style="font-size:small">, 0);</span></div><p>In Python 2.x, a pointer to the API struct is stored as a
+<span style="font-family:monospace">PyCObject</span> in the <span style="font-family:monospace">_omnipy</span> module with the name
+<span style="font-family:monospace">API</span>. It can be accessed with code like:</p><div class="lstlisting"><span style="font-size:small">PyObject</span><span style="font-size:small">*     </span><span style="font-size:small">omnipy</span><span style="font-size:small"> = </span><span style="font-size:small">PyImport_ImportModule</span><span style="font-size:small">((</span><span style="font-size:small"><span style="font-weight:bold">char</span></span><span style="font-size:small">*)</span><span style="font-size:small"><span style="font-size:small">"_omnipy"</span></span><span style="font-size:small">);</span><span style="font-size:small">
 </span><span style="font-size:small">PyObject</span><span style="font-size:small">*     </span><span style="font-size:small">pyapi</span><span style="font-size:small">  = </span><span style="font-size:small">PyObject_GetAttrString</span><span style="font-size:small">(</span><span style="font-size:small">omnipy</span><span style="font-size:small">, (</span><span style="font-size:small"><span style="font-weight:bold">char</span></span><span style="font-size:small">*)</span><span style="font-size:small"><span style="font-size:small">"API"</span></span><span style="font-size:small">);</span><span style="font-size:small">
 </span><span style="font-size:small">omniORBpyAPI</span><span style="font-size:small">* </span><span style="font-size:small">api</span><span style="font-size:small">    = (</span><span style="font-size:small">omniORBpyAPI</span><span style="font-size:small">*)</span><span style="font-size:small">PyCObject_AsVoidPtr</span><span style="font-size:small">(</span><span style="font-size:small">pyapi</span><span style="font-size:small">);</span><span style="font-size:small">
 </span><span style="font-size:small">Py_DECREF</span><span style="font-size:small">(</span><span style="font-size:small">pyapi</span><span style="font-size:small">);</span></div><p>See the structure definition in <span style="font-family:monospace">omniORBpy.h</span> for
@@ -2472,8 +2474,10 @@ C++ documentation for details.</p>
 <a id="chap:interceptors"></a></p><p>omniORBpy has limited interceptor support. Interceptors permit the
 application to insert processing at various points along the call
 chain, as requests are processed. The Portable Interceptors API is not
-yet supported.</p><p>Interceptors are registered using functions in the
-<span style="font-family:monospace">omniORB.interceptors</span> module:</p><div class="lstlisting"><span style="font-size:small">  </span><span style="font-size:small">addClientSendRequest</span><span style="font-size:small">()</span><span style="font-size:small">
+supported.</p>
+<!--TOC section id="sec119" Request interceptors-->
+<h2 id="sec119" class="section">9.1&#XA0;&#XA0;Request interceptors</h2><!--SEC END --><p>Interceptors for incoming and outgoing requests are registered using
+functions in the <span style="font-family:monospace">omniORB.interceptors</span> module:</p><div class="lstlisting"><span style="font-size:small">  </span><span style="font-size:small">addClientSendRequest</span><span style="font-size:small">()</span><span style="font-size:small">
 </span><span style="font-size:small">  </span><span style="font-size:small">addClientReceiveReply</span><span style="font-size:small">()</span><span style="font-size:small">
 </span><span style="font-size:small">  </span><span style="font-size:small">addServerReceiveRequest</span><span style="font-size:small">()</span><span style="font-size:small">
 </span><span style="font-size:small">  </span><span style="font-size:small">addServerSendReply</span><span style="font-size:small">()</span><span style="font-size:small">
@@ -2497,21 +2501,38 @@ above, by appending to the list. Encapsulations are created with
 <span style="font-family:monospace">omniORB.cdrMarshal()</span>.</p><p>Interceptor registration functions may only be called before the ORB
 is initialised. Attempting to call them later results in a
 <span style="font-family:monospace">BAD_INV_ORDER</span> exception.</p>
-<!--TOC chapter id="sec119" Objects by value-->
-<h1 id="sec119" class="chapter">Chapter&#XA0;10&#XA0;&#XA0;Objects by value</h1><!--SEC END --><p>
+<!--TOC section id="sec120" Thread interceptors-->
+<h2 id="sec120" class="section">9.2&#XA0;&#XA0;Thread interceptors</h2><!--SEC END --><p>Thread interceptors are registered using functions in the
+<span style="font-family:monospace">omniORB.interceptors</span> module:</p><div class="lstlisting"><span style="font-size:small">  </span><span style="font-size:small">addAssignUpcallThread</span><span style="font-size:small">
+</span><span style="font-size:small">  </span><span style="font-size:small">addAssignAMIThread</span></div><p>To register thread interceptors, call the relevant registration
+function with a callable argument. The callable can be a simple
+function that returns None, or a generator that yields once. When a
+thread is assigned to perform server upcalls or AMI calls, the
+corresponding function is called. If it is a simple function, the
+function is called when the thread is assigned. If it is a generator,
+it is called when the thread is assigned, yields to permit the thread
+to execute, and then resumes when the thread is unassigned. For
+example:</p><div class="lstlisting"><span style="font-size:small"><span style="font-weight:bold">def</span></span><span style="font-size:small"> </span><span style="font-size:small">upcallInterceptor</span><span style="font-size:small">():</span><span style="font-size:small">
+</span><span style="font-size:small">    </span><span style="font-size:small"><span style="font-weight:bold">print</span></span><span style="font-size:small">(</span><span style="font-size:small"><span style="font-size:small">"This thread is about to be used to call into server code"</span></span><span style="font-size:small">)</span><span style="font-size:small">
+</span><span style="font-size:small">    </span><span style="font-size:small">yield</span><span style="font-size:small">
+</span><span style="font-size:small">    </span><span style="font-size:small"><span style="font-weight:bold">print</span></span><span style="font-size:small">(</span><span style="font-size:small"><span style="font-size:small">"The thread has finished"</span></span><span style="font-size:small">)</span><span style="font-size:small">
+</span><span style="font-size:small">
+</span><span style="font-size:small">omniORB</span><span style="font-size:small">.</span><span style="font-size:small">interceptors</span><span style="font-size:small">.</span><span style="font-size:small">addAssignUpcallThread</span><span style="font-size:small">(</span><span style="font-size:small">upcallInterceptor</span><span style="font-size:small">)</span></div>
+<!--TOC chapter id="sec121" Objects by value-->
+<h1 id="sec121" class="chapter">Chapter&#XA0;10&#XA0;&#XA0;Objects by value</h1><!--SEC END --><p>
 <a id="chap:valuetype"></a></p><p>omniORBpy supports objects by value, declared with the
 <span style="font-family:monospace">valuetype</span> keyword in IDL. This chapter outlines some issues to
 do with using valuetypes in omniORB. You are assumed to have read the
 relevant parts of the CORBA specification, specifically chapters 4 and
 5 of the CORBA 2.6 specification, and section 1.3.10 of the Python
 language mapping, version 1.2.</p>
-<!--TOC section id="sec120" Features-->
-<h2 id="sec120" class="section">10.1&#XA0;&#XA0;Features</h2><!--SEC END --><p>omniORB supports the complete objects by value specification, with the
+<!--TOC section id="sec122" Features-->
+<h2 id="sec122" class="section">10.1&#XA0;&#XA0;Features</h2><!--SEC END --><p>omniORB supports the complete objects by value specification, with the
 exception of custom valuetypes. All other features including value
 boxes, value sharing semantics, abstract valuetypes, and abstract
 interfaces are supported.</p>
-<!--TOC section id="sec121" Value sharing and local calls-->
-<h2 id="sec121" class="section">10.2&#XA0;&#XA0;Value sharing and local calls</h2><!--SEC END --><p>When valuetypes are passed as parameters in CORBA calls (i.e. calls
+<!--TOC section id="sec123" Value sharing and local calls-->
+<h2 id="sec123" class="section">10.2&#XA0;&#XA0;Value sharing and local calls</h2><!--SEC END --><p>When valuetypes are passed as parameters in CORBA calls (i.e. calls
 on CORBA objects declared with <span style="font-family:monospace">interface</span> in IDL), the structure
 of related values is maintained. Consider, for example, the following
 IDL definitions (which are from the example code in
@@ -2543,8 +2564,8 @@ values it passes as parameters (and similarly, the object
 implementation will see any changes the client makes to returned
 values). To choose this option, set the <span style="font-family:monospace">copyValuesInLocalCalls</span>
 configuration parameter to zero.</p>
-<!--TOC section id="sec122" Value factories-->
-<h2 id="sec122" class="section">10.3&#XA0;&#XA0;Value factories</h2><!--SEC END --><p>As specified in section 1.3.10 of the Python language mapping (version
+<!--TOC section id="sec124" Value factories-->
+<h2 id="sec124" class="section">10.3&#XA0;&#XA0;Value factories</h2><!--SEC END --><p>As specified in section 1.3.10 of the Python language mapping (version
 1.2), factories are automatically registered for values with no
 operations. This means that in common usage where values are just used
 to hold state, the application code does not need to implement and
@@ -2559,12 +2580,12 @@ instance with a <span style="font-family:monospace">__call__</span> method takin
 omniORBpy is less restrictive than that, and permits the use of
 <em>any</em> callable object, in particular the value implementation
 class itself.</p>
-<!--TOC section id="sec123" Standard value boxes-->
-<h2 id="sec123" class="section">10.4&#XA0;&#XA0;Standard value boxes</h2><!--SEC END --><p>The standard <span style="font-family:monospace">CORBA.StringValue</span> and <span style="font-family:monospace">CORBA.WStringValue</span>
+<!--TOC section id="sec125" Standard value boxes-->
+<h2 id="sec125" class="section">10.4&#XA0;&#XA0;Standard value boxes</h2><!--SEC END --><p>The standard <span style="font-family:monospace">CORBA.StringValue</span> and <span style="font-family:monospace">CORBA.WStringValue</span>
 value boxes are available to application code. To make the definitions
 available in IDL, #include the standard <span style="font-family:monospace">orb.idl</span>.</p>
-<!--TOC section id="sec124" Values inside Anys-->
-<h2 id="sec124" class="section">10.5&#XA0;&#XA0;Values inside Anys</h2><!--SEC END --><p>Valuetypes inserted into Anys cause a number of interesting issues.
+<!--TOC section id="sec126" Values inside Anys-->
+<h2 id="sec126" class="section">10.5&#XA0;&#XA0;Values inside Anys</h2><!--SEC END --><p>Valuetypes inserted into Anys cause a number of interesting issues.
 Even when inside Anys, values are required to support complete sharing
 semantics. Take this IDL for example:</p><div class="lstlisting"><span style="font-size:small"><span style="font-weight:bold">module</span></span><span style="font-size:small"> </span><span style="font-size:small">ValueTest</span><span style="font-size:small"> {</span><span style="font-size:small">
 </span><span style="font-size:small">  </span><span style="font-size:small"><span style="font-weight:bold">valuetype</span></span><span style="font-size:small"> </span><span style="font-size:small">One</span><span style="font-size:small"> {</span><span style="font-size:small">
@@ -2610,8 +2631,8 @@ set to the constructed <span style="font-family:monospace">Two</span> type, rath
 an instance of the application&#X2019;s registered <span style="font-family:monospace">One</span> type.</p><p>Because of these issues, it is best to avoid defining interfaces that
 mix valuetypes and Anys in a single operation, and certainly to avoid
 trying to share plain values with values inside Anys.</p>
-<!--TOC chapter id="sec125" Asynchronous Method Invocation-->
-<h1 id="sec125" class="chapter">Chapter&#XA0;11&#XA0;&#XA0;Asynchronous Method Invocation</h1><!--SEC END --><p>
+<!--TOC chapter id="sec127" Asynchronous Method Invocation-->
+<h1 id="sec127" class="chapter">Chapter&#XA0;11&#XA0;&#XA0;Asynchronous Method Invocation</h1><!--SEC END --><p>
 <a id="chap:ami"></a></p><p>omniORB 4.2 supports Asynchronous Method Invocation, AMI, as defined
 in the CORBA Messaging specification. It supports both the polling and
 callback models of asynchronous calls. Note that omniORB does not
@@ -2623,8 +2644,8 @@ specification as described in the CORBA 3.1 specification, chapter
 the same as the one in CORBA 2.6. The only significant difference is
 that exception replies in the callback model use a simpler
 interface-independent mapping.</p>
-<!--TOC section id="sec126" Implied IDL-->
-<h2 id="sec126" class="section">11.1&#XA0;&#XA0;Implied IDL</h2><!--SEC END --><p>AMI works by defining some additional <span style="font-style:italic">implied IDL</span> for each
+<!--TOC section id="sec128" Implied IDL-->
+<h2 id="sec128" class="section">11.1&#XA0;&#XA0;Implied IDL</h2><!--SEC END --><p>AMI works by defining some additional <span style="font-style:italic">implied IDL</span> for each
 interface in the real IDL. The implied IDL contains type and
 operation definitions that enable asynchronous calls.</p><p>As a guide to the implied IDL, there is a special <span style="font-family:monospace">ami</span>
 back-end to omniidl that outputs the implied IDL for the given input
@@ -2653,24 +2674,24 @@ output an interleaved version that shows the original IDL and the
 implied IDL together.</p><p>Note that the implied IDL output is for information only. You should
 not compile it, but rather instruct the omniidl Python back-end to
 generate the corresponding Python definitions.</p>
-<!--TOC section id="sec127" Generating AMI stubs-->
-<h2 id="sec127" class="section">11.2&#XA0;&#XA0;Generating AMI stubs</h2><!--SEC END --><p>To generate stub code including AMI types and operations, give the
+<!--TOC section id="sec129" Generating AMI stubs-->
+<h2 id="sec129" class="section">11.2&#XA0;&#XA0;Generating AMI stubs</h2><!--SEC END --><p>To generate stub code including AMI types and operations, give the
 <span style="font-family:monospace">-Wbami</span> command line option to omniidl&#X2019;s <span style="font-family:monospace">python</span>
 back-end:</p><blockquote class="quote">
 <span style="font-family:monospace">omniidl -bpython -Wbami echo.idl</span>
 </blockquote><p>That generates the normal Python stubs and skeletons, plus
 all the definitions in the implied IDL.</p>
-<!--TOC section id="sec128" AMI examples-->
-<h2 id="sec128" class="section">11.3&#XA0;&#XA0;AMI examples</h2><!--SEC END --><p>Example AMI clients for the <span style="font-family:monospace">Example::Echo</span> server can be found in
+<!--TOC section id="sec130" AMI examples-->
+<h2 id="sec130" class="section">11.3&#XA0;&#XA0;AMI examples</h2><!--SEC END --><p>Example AMI clients for the <span style="font-family:monospace">Example::Echo</span> server can be found in
 <span style="font-family:monospace">examples/ami</span>.</p>
-<!--TOC chapter id="sec129" Resources-->
-<h1 id="sec129" class="chapter">Chapter&#XA0;12&#XA0;&#XA0;Resources</h1><!--SEC END --><p>There are a number of useful online resources related to omniORB:</p><ul class="itemize"><li class="li-itemize"><a href="http://omniorb.sourceforge.net/"><span style="font-family:monospace">http://omniorb.sourceforge.net/</span></a> is the main omniORB web
-site.</li><li class="li-itemize">The omniORB FAQ is at <a href="http://omniorb.sourceforge.net/faq.html"><span style="font-family:monospace">http://omniorb.sourceforge.net/faq.html</span></a></li><li class="li-itemize">The omniORB mailing list is the first port of call for questions
+<!--TOC chapter id="sec131" Resources-->
+<h1 id="sec131" class="chapter">Chapter&#XA0;12&#XA0;&#XA0;Resources</h1><!--SEC END --><p>There are a number of useful online resources related to omniORB:</p><ul class="itemize"><li class="li-itemize"><a href="https://www.omniorb.net/"><span style="font-family:monospace">https://www.omniorb.net/</span></a> is the main omniORB web
+site.</li><li class="li-itemize">The omniORB mailing list is the first port of call for questions
 that are not answered in this document or in the FAQ. Subscription
 information and archives are at
-<a href="http://omniorb.sourceforge.net/list.html"><span style="font-family:monospace">http://omniorb.sourceforge.net/list.html</span></a></li><li class="li-itemize">Commercial support is available from
-<a href="http://www.omniorb-support.com/"><span style="font-family:monospace">http://www.omniorb-support.com/</span></a></li></ul><!--TOC chapter id="sec130" References-->
-<h1 id="sec130" class="chapter">References</h1><!--SEC END --><dl class="thebibliography"><dt class="dt-thebibliography">
+<a href="https://www.omniorb.net/list.html"><span style="font-family:monospace">https://www.omniorb.net/list.html</span></a></li><li class="li-itemize">Commercial support is available from
+<a href="https://www.omniorb-support.com/"><span style="font-family:monospace">https://www.omniorb-support.com/</span></a></li></ul><!--TOC chapter id="sec132" References-->
+<h1 id="sec132" class="chapter">References</h1><!--SEC END --><dl class="thebibliography"><dt class="dt-thebibliography">
 <a id="rfc2396">[BLFIM98]</a></dt><dd class="dd-thebibliography">
 T. Berners-Lee, R. Fielding, U.C. Irvine, and L. Masinter.
 <em>U</em><em>niform </em><em>R</em><em>esource </em><em>I</em><em>dentifiers (</em><em>URI</em><em>): Generic Syntax</em>.

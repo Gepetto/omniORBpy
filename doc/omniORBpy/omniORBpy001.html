@@ -2,13 +2,13 @@
 <html >
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<meta name="generator" content="hevea 2.30">
+<meta name="generator" content="hevea 2.32">
 <link rel="stylesheet" type="text/css" href="omniORBpy.css">
 <title>Introduction</title>
 </head>
 <body >
-<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
-<a href="omniORBpy002.html"><img src="next_motif.gif" alt="Next"></a>
+<a href="index.html"><img src="contents_motif.svg" alt="Up"></a>
+<a href="omniORBpy002.html"><img src="next_motif.svg" alt="Next"></a>
 <hr>
 <h1 id="sec1" class="chapter">Chapter&#XA0;1&#XA0;&#XA0;Introduction</h1>
 <p>omniORBpy is an Object Request Broker (ORB) that implements the CORBA
@@ -47,10 +47,11 @@ It is designed to be easy to port to new platforms.</p>
 <h3 id="sec5" class="subsection">1.1.3&#XA0;&#XA0;Missing features</h3>
 <p>
 <a id="sec:missing"></a></p><p>omniORB is not a complete implementation of the CORBA 2.6 core.
-The following is a list of the most significant missing features.</p><ul class="itemize"><li class="li-itemize">omniORB does not have its own Interface Repository. However, it
-can act as a client to an IfR. The omniifr project
-(<a href="http://omniifr.sourceforge.net/"><span style="font-family:monospace">http://omniifr.sourceforge.net/</span></a>) aims to create an IfR for
-omniORB.</li><li class="li-itemize">omniORB supports interceptors, but not the standard Portable
+The following is a list of the most significant missing features.</p><ul class="itemize"><li class="li-itemize">For some very dynamic uses of CORBA, you may need an Interface
+Repository. omniORB does not have its own one, but it can act as a
+client to an IfR. The omniifr project
+(<a href="https://github.com/omniorb/omniifr"><span style="font-family:monospace">https://github.com/omniorb/omniifr</span></a>) aims to create an IfR
+for omniORB.</li><li class="li-itemize">omniORB supports interceptors, but not the standard Portable
 Interceptor API. Interceptor facilities available from Python code
 are quite limited.</li><li class="li-itemize">DII, DSI and DynAny are not available in Python, but Python&#X2019;s
 normal dynamic features can be used to write code with the same
@@ -95,7 +96,7 @@ configure is the Naming service, omniNames. To do that, the
 configuration file or registry should contain an entry of the form</p><pre class="verbatim">  InitRef = NameService=corbaname::my.host.name
 </pre><p>See section&#XA0;<a href="omniORBpy007.html#sec%3Acorbaname">7.1.2</a> for full details of corbaname URIs.</p>
 <hr>
-<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
-<a href="omniORBpy002.html"><img src="next_motif.gif" alt="Next"></a>
+<a href="index.html"><img src="contents_motif.svg" alt="Up"></a>
+<a href="omniORBpy002.html"><img src="next_motif.svg" alt="Next"></a>
 </body>
 </html>

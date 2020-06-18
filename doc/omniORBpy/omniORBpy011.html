@@ -2,16 +2,16 @@
 <html >
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<meta name="generator" content="hevea 2.30">
+<meta name="generator" content="hevea 2.32">
 <link rel="stylesheet" type="text/css" href="omniORBpy.css">
 <title>Asynchronous Method Invocation</title>
 </head>
 <body >
-<a href="omniORBpy010.html"><img src="previous_motif.gif" alt="Previous"></a>
-<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
-<a href="omniORBpy012.html"><img src="next_motif.gif" alt="Next"></a>
+<a href="omniORBpy010.html"><img src="previous_motif.svg" alt="Previous"></a>
+<a href="index.html"><img src="contents_motif.svg" alt="Up"></a>
+<a href="omniORBpy012.html"><img src="next_motif.svg" alt="Next"></a>
 <hr>
-<h1 id="sec125" class="chapter">Chapter&#XA0;11&#XA0;&#XA0;Asynchronous Method Invocation</h1>
+<h1 id="sec127" class="chapter">Chapter&#XA0;11&#XA0;&#XA0;Asynchronous Method Invocation</h1>
 <p>
 <a id="chap:ami"></a></p><p>omniORB 4.2 supports Asynchronous Method Invocation, AMI, as defined
 in the CORBA Messaging specification. It supports both the polling and
@@ -24,7 +24,7 @@ specification as described in the CORBA 3.1 specification, chapter
 the same as the one in CORBA 2.6. The only significant difference is
 that exception replies in the callback model use a simpler
 interface-independent mapping.</p>
-<h2 id="sec126" class="section">11.1&#XA0;&#XA0;Implied IDL</h2>
+<h2 id="sec128" class="section">11.1&#XA0;&#XA0;Implied IDL</h2>
 <p>AMI works by defining some additional <span style="font-style:italic">implied IDL</span> for each
 interface in the real IDL. The implied IDL contains type and
 operation definitions that enable asynchronous calls.</p><p>As a guide to the implied IDL, there is a special <span style="font-family:monospace">ami</span>
@@ -54,19 +54,19 @@ output an interleaved version that shows the original IDL and the
 implied IDL together.</p><p>Note that the implied IDL output is for information only. You should
 not compile it, but rather instruct the omniidl Python back-end to
 generate the corresponding Python definitions.</p>
-<h2 id="sec127" class="section">11.2&#XA0;&#XA0;Generating AMI stubs</h2>
+<h2 id="sec129" class="section">11.2&#XA0;&#XA0;Generating AMI stubs</h2>
 <p>To generate stub code including AMI types and operations, give the
 <span style="font-family:monospace">-Wbami</span> command line option to omniidl&#X2019;s <span style="font-family:monospace">python</span>
 back-end:</p><blockquote class="quote">
 <span style="font-family:monospace">omniidl -bpython -Wbami echo.idl</span>
 </blockquote><p>That generates the normal Python stubs and skeletons, plus
 all the definitions in the implied IDL.</p>
-<h2 id="sec128" class="section">11.3&#XA0;&#XA0;AMI examples</h2>
+<h2 id="sec130" class="section">11.3&#XA0;&#XA0;AMI examples</h2>
 <p>Example AMI clients for the <span style="font-family:monospace">Example::Echo</span> server can be found in
 <span style="font-family:monospace">examples/ami</span>.</p>
 <hr>
-<a href="omniORBpy010.html"><img src="previous_motif.gif" alt="Previous"></a>
-<a href="index.html"><img src="contents_motif.gif" alt="Up"></a>
-<a href="omniORBpy012.html"><img src="next_motif.gif" alt="Next"></a>
+<a href="omniORBpy010.html"><img src="previous_motif.svg" alt="Previous"></a>
+<a href="index.html"><img src="contents_motif.svg" alt="Up"></a>
+<a href="omniORBpy012.html"><img src="next_motif.svg" alt="Next"></a>
 </body>
 </html>
